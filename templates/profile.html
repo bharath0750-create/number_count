@@ -3,190 +3,586 @@
 {% block title %}Profile - 3D & 4D Number Counter{% endblock %}
 
 {% block content %}
+
 <div class="row justify-content-center">
+
     <div class="col-12 col-lg-8">
+
+        <!-- Profile Card -->
         <div class="card shadow-sm border-0 mb-4">
+
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-semibold"><i class="fas fa-user-cog me-2 text-primary"></i>Profile Settings</h4>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+
+                <h4 class="mb-0 fw-semibold">
+                    <i class="fas fa-user-cog me-2 text-primary"></i>
+                    Profile Settings
+                </h4>
+
+                <a href="{{ url_for('dashboard') }}"
+                   class="btn btn-sm btn-outline-secondary">
+
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Dashboard
+
                 </a>
+
             </div>
+
+
             <div class="card-body">
+
+                <!-- User Header -->
                 <div class="row align-items-center mb-4">
+
                     <div class="col-auto">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" 
+
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
                              style="width: 80px; height: 80px; font-size: 2rem;">
+
                             <i class="fas fa-user"></i>
+
                         </div>
+
                     </div>
+
+
                     <div class="col">
-                        <h4 class="mb-1">{{ user[1] }}</h4>
-                        <p class="text-muted mb-1">@{{ user[2] }}</p>
-                        <small class="text-muted">Member since {{ user[4].strftime('%B %Y') if user[4] else 'N/A' }}</small>
+
+                        <h4 class="mb-1">
+                            {{ user[1] }}
+                        </h4>
+
+                        <p class="text-muted mb-1">
+                            @{{ user[2] }}
+                        </p>
+
+                        <!-- FIXED: created_at is STRING -->
+                        <small class="text-muted">
+
+                            Member since
+                            {{ user[4] if user[4] else 'N/A' }}
+
+                        </small>
+
                     </div>
+
                 </div>
+
+
                 <hr>
+
+
+                <!-- Account Information -->
                 <div class="row g-3">
+
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Full Name</label>
-                        <p class="form-control-plaintext">{{ user[1] }}</p>
+
+                        <label class="form-label fw-semibold">
+                            Full Name
+                        </label>
+
+                        <p class="form-control-plaintext">
+                            {{ user[1] }}
+                        </p>
+
                     </div>
+
+
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Username</label>
-                        <p class="form-control-plaintext">{{ user[2] }}</p>
+
+                        <label class="form-label fw-semibold">
+                            Username
+                        </label>
+
+                        <p class="form-control-plaintext">
+                            {{ user[2] }}
+                        </p>
+
                     </div>
+
+
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Email</label>
-                        <p class="form-control-plaintext">{{ user[3] }}</p>
+
+                        <label class="form-label fw-semibold">
+                            Email
+                        </label>
+
+                        <p class="form-control-plaintext">
+                            {{ user[3] }}
+                        </p>
+
                     </div>
+
+
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Account Created</label>
-                        <p class="form-control-plaintext">{{ user[4].strftime('%Y-%m-%d %H:%M') if user[4] else 'N/A' }}</p>
+
+                        <label class="form-label fw-semibold">
+                            Account Created
+                        </label>
+
+                        <!-- FIXED: NO strftime() -->
+                        <p class="form-control-plaintext">
+
+                            {{ user[4] if user[4] else 'N/A' }}
+
+                        </p>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
 
         <!-- Account Statistics -->
         <div class="card shadow-sm border-0 mb-4">
+
             <div class="card-header bg-white border-0">
-                <h5 class="mb-0 fw-semibold"><i class="fas fa-chart-bar me-2 text-info"></i>Account Statistics</h5>
+
+                <h5 class="mb-0 fw-semibold">
+
+                    <i class="fas fa-chart-bar me-2 text-info"></i>
+                    Account Statistics
+
+                </h5>
+
             </div>
+
+
             <div class="card-body">
+
                 <div id="statsContainer">
+
                     <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="text-muted mt-2">Loading statistics...</p>
+
+                        <div class="spinner-border text-primary"
+                             role="status">
+                        </div>
+
+                        <p class="text-muted mt-2">
+                            Loading statistics...
+                        </p>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
 
         <!-- Danger Zone -->
-        <div class="card shadow-sm border-0 border-danger">
+        <div class="card shadow-sm border-0 border-danger mb-4">
+
             <div class="card-header bg-danger bg-opacity-10 border-danger">
-                <h5 class="mb-0 fw-semibold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+
+                <h5 class="mb-0 fw-semibold text-danger">
+
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Danger Zone
+
+                </h5>
+
             </div>
+
+
             <div class="card-body">
-                <p class="text-muted">These actions are irreversible. Please proceed with caution.</p>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
-                        <i class="fas fa-trash-alt me-2"></i>Delete All My Numbers
+
+                <p class="text-muted">
+
+                    These actions are irreversible.
+                    Please proceed with caution.
+
+                </p>
+
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <!-- Delete All Numbers -->
+                    <button class="btn btn-outline-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteAllModal">
+
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Delete All My Numbers
+
                     </button>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                        <i class="fas fa-user-times me-2"></i>Delete My Account
+
+
+                    <!-- Delete Account -->
+                    <button class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteAccountModal">
+
+                        <i class="fas fa-user-times me-2"></i>
+                        Delete My Account
+
                     </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Delete All Numbers Modal -->
-<div class="modal fade" id="deleteAllModal" tabindex="-1" aria-hidden="true">
+
+<!-- ================================================= -->
+<!-- DELETE ALL NUMBERS MODAL -->
+<!-- ================================================= -->
+
+<div class="modal fade"
+     id="deleteAllModal"
+     tabindex="-1"
+     aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
+
         <div class="modal-content">
+
             <div class="modal-header bg-warning bg-opacity-10">
-                <h5 class="modal-title text-warning"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete All Numbers</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <h5 class="modal-title text-warning">
+
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirm Delete All Numbers
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
             </div>
+
+
             <div class="modal-body">
-                <p>This will permanently delete <strong>ALL</strong> your number entries. This action cannot be undone.</p>
+
+                <p>
+
+                    This will permanently delete
+                    <strong>ALL</strong>
+                    your number entries.
+
+                    This action cannot be undone.
+
+                </p>
+
+
                 <div class="alert alert-warning">
-                    <i class="fas fa-info-circle me-2"></i>Your account will remain active. Only your number data will be removed.
+
+                    <i class="fas fa-info-circle me-2"></i>
+
+                    Your account will remain active.
+                    Only your number data will be removed.
+
                 </div>
+
             </div>
+
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" action="{{ url_for('delete_all_numbers') }}" class="d-inline">
-                    <button type="submit" class="btn btn-warning text-dark" onclick="return confirm('Are you absolutely sure? Type DELETE in the next prompt to confirm.')">
-                        <i class="fas fa-trash me-2"></i>Delete All Numbers
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <form method="POST"
+                      action="{{ url_for('delete_all_numbers') }}"
+                      class="d-inline">
+
+                    <button type="submit"
+                            class="btn btn-warning text-dark"
+                            onclick="return confirm('Are you absolutely sure?');">
+
+                        <i class="fas fa-trash me-2"></i>
+                        Delete All Numbers
+
                     </button>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Delete Account Modal -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+
+<!-- ================================================= -->
+<!-- DELETE ACCOUNT MODAL -->
+<!-- ================================================= -->
+
+<div class="modal fade"
+     id="deleteAccountModal"
+     tabindex="-1"
+     aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
+
         <div class="modal-content">
+
             <div class="modal-header bg-danger bg-opacity-10">
-                <h5 class="modal-title text-danger"><i class="fas fa-user-times me-2"></i>Confirm Delete Account</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <h5 class="modal-title text-danger">
+
+                    <i class="fas fa-user-times me-2"></i>
+                    Confirm Delete Account
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
             </div>
+
+
             <div class="modal-body">
-                <p class="text-danger fw-semibold">WARNING: This will permanently delete your account and ALL associated data.</p>
+
+                <p class="text-danger fw-semibold">
+
+                    WARNING: This will permanently delete
+                    your account and ALL associated data.
+
+                </p>
+
+
                 <ul class="mb-3">
+
                     <li>Your user account</li>
                     <li>All your 3D and 4D numbers</li>
                     <li>All your statistics and history</li>
+
                 </ul>
-                <p>This action is <strong>irreversible</strong>.</p>
+
+
+                <p>
+
+                    This action is
+                    <strong>irreversible</strong>.
+
+                </p>
+
             </div>
+
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" action="{{ url_for('delete_account') }}" class="d-inline">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Type DELETE ACCOUNT to confirm permanent deletion.')">
-                        <i class="fas fa-user-times me-2"></i>Delete My Account Permanently
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <form method="POST"
+                      action="{{ url_for('delete_account') }}"
+                      class="d-inline">
+
+                    <button type="submit"
+                            class="btn btn-danger"
+                            onclick="return confirm('Are you absolutely sure you want to permanently delete your account?');">
+
+                        <i class="fas fa-user-times me-2"></i>
+
+                        Delete My Account Permanently
+
                     </button>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}
 
+
+<!-- ================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ================================================= -->
+
 {% block extra_js %}
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const container =
+        document.getElementById('statsContainer');
+
+
     fetch('/api/stats')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('statsContainer');
-            container.innerHTML = `
-                <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <div class="card bg-primary bg-opacity-10 border-0 text-center">
-                            <div class="card-body py-3">
-                                <h2 class="text-primary mb-1 fw-bold">${data.total_3d + data.total_4d}</h2>
-                                <small class="text-muted">Total Valid Numbers</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card bg-info bg-opacity-10 border-0 text-center">
-                            <div class="card-body py-3">
-                                <h2 class="text-info mb-1 fw-bold">${data.total_3d}</h2>
-                                <small class="text-muted">3D Numbers</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card bg-success bg-opacity-10 border-0 text-center">
-                            <div class="card-body py-3">
-                                <h2 class="text-success mb-1 fw-bold">${data.total_4d}</h2>
-                                <small class="text-muted">4D Numbers</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card bg-secondary bg-opacity-10 border-0 text-center">
-                            <div class="card-body py-3">
-                                <h2 class="text-secondary mb-1 fw-bold">${Math.round((data.total_3d + data.total_4d) / 7)}</h2>
-                                <small class="text-muted">Avg per Day (est.)</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    'HTTP error: ' + response.status
+                );
+            }
+
+            return response.json();
+
         })
-        .catch(err => {
-            document.getElementById('statsContainer').innerHTML = 
-                '<div class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-2"></i>Failed to load statistics</div>';
+
+
+        .then(data => {
+
+            const total3D =
+                Number(data.total_3d || 0);
+
+            const total4D =
+                Number(data.total_4d || 0);
+
+            const totalValid =
+                total3D + total4D;
+
+
+            container.innerHTML = `
+
+                <div class="row g-3">
+
+                    <!-- Total -->
+                    <div class="col-6 col-md-3">
+
+                        <div class="card bg-primary bg-opacity-10 border-0 text-center">
+
+                            <div class="card-body py-3">
+
+                                <h2 class="text-primary mb-1 fw-bold">
+                                    ${totalValid}
+                                </h2>
+
+                                <small class="text-muted">
+                                    Total Valid Numbers
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- 3D -->
+                    <div class="col-6 col-md-3">
+
+                        <div class="card bg-info bg-opacity-10 border-0 text-center">
+
+                            <div class="card-body py-3">
+
+                                <h2 class="text-info mb-1 fw-bold">
+                                    ${total3D}
+                                </h2>
+
+                                <small class="text-muted">
+                                    3D Numbers
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- 4D -->
+                    <div class="col-6 col-md-3">
+
+                        <div class="card bg-success bg-opacity-10 border-0 text-center">
+
+                            <div class="card-body py-3">
+
+                                <h2 class="text-success mb-1 fw-bold">
+                                    ${total4D}
+                                </h2>
+
+                                <small class="text-muted">
+                                    4D Numbers
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Average -->
+                    <div class="col-6 col-md-3">
+
+                        <div class="card bg-secondary bg-opacity-10 border-0 text-center">
+
+                            <div class="card-body py-3">
+
+                                <h2 class="text-secondary mb-1 fw-bold">
+                                    ${Math.round(totalValid / 7)}
+                                </h2>
+
+                                <small class="text-muted">
+                                    Avg per Day (est.)
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        })
+
+
+        .catch(error => {
+
+            console.error(
+                'Stats loading error:',
+                error
+            );
+
+
+            container.innerHTML = `
+
+                <div class="text-center py-4 text-danger">
+
+                    <i class="fas fa-exclamation-circle me-2"></i>
+
+                    Failed to load statistics
+
+                </div>
+
+            `;
+
         });
+
 });
+
 </script>
+
 {% endblock %}
