@@ -176,32 +176,83 @@ def dashboard():
 @app.route('/add-numbers', methods=['GET', 'POST'])
 @login_required
 def add_numbers():
-    if request.method == 'POST':
-        numbers_input = request.form.get('numbers_input', '')
-        numbers = parse_numbers_input(numbers_input)
-        if not numbers:
-            flash('No valid numbers found in input.', 'warning')
-            return redirect(url_for('add_numbers'))
-        user_id = session['user_id']
-        db = get_db()
-        added_count = 0
-        invalid_count = 0
-        for number in numbers:
-            num_type = classify_number(number)
-            if num_type:
-                db.execute("INSERT INTO numbers (user_id, number, number_type) VALUES (?, ?, ?)", (user_id, number, num_type))
-                if num_type == 'Invalid':
-                    invalid_count += 1
-                else:
-                    added_count += 1
-        db.commit()
-        if added_count > 0:
-            flash(f'Successfully added {added_count} number(s).', 'success')
-        if invalid_count > 0:
-            flash(f'{invalid_count} invalid number(s) were also recorded.', 'warning')
-        return redirect(url_for('dashboard'))
-    return render_template('add_numbers.html', username=session.get('username'))
+    try:
+        if request.method == 'POST':
 
+            numbers_input = request.form.get('numbers_input', '').strip()
+
+            if not numbers_input:
+                flash('Please enter at least one number.', 'warning')
+                return redirect(url_for('add_numbers'))
+
+            numbers = parse_numbers_input(numbers_input)
+
+            if not numbers:
+                flash('No valid numbers found in input.', 'warning')
+                return redirect(url_for('add_numbers'))
+
+            user_id = session.get('user_id')
+
+            if not user_id:
+                flash('Session expired. Please login again.', 'warning')
+                return redirect(url_for('login'))
+
+            db = get_db()
+
+            added_count = 0
+            invalid_count = 0
+
+            for number in numbers:
+
+                num_type = classify_number(number)
+
+                if num_type:
+
+                    db.execute(
+                        """
+                        INSERT INTO numbers
+                        (user_id, number, number_type)
+                        VALUES (?, ?, ?)
+                        """,
+                        (user_id, number, num_type)
+                    )
+
+                    if num_type == 'Invalid':
+                        invalid_count += 1
+                    else:
+                        added_count += 1
+
+            db.commit()
+
+            if added_count > 0:
+                flash(
+                    f'Successfully added {added_count} number(s).',
+                    'success'
+                )
+
+            if invalid_count > 0:
+                flash(
+                    f'{invalid_count} invalid number(s) were also recorded.',
+                    'warning'
+                )
+
+            return redirect(url_for('dashboard'))
+
+        return render_template(
+            'add_numbers.html',
+            username=session.get('username')
+        )
+
+    except Exception as e:
+
+        import traceback
+
+        print("ADD NUMBER ERROR:", str(e))
+        traceback.print_exc()
+
+        flash(f'Error adding numbers: {str(e)}', 'danger')
+
+        return redirect(url_for('add_numbers'))
 @app.route('/numbers')
 @login_required
 def numbers():
