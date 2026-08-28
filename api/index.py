@@ -12,6 +12,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-please')
 app.config['DATABASE'] = '/tmp/number_counter.db'
+app.config['DEBUG'] = True
+app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
