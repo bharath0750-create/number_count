@@ -1,19 +1,73 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const photoInput = document.getElementById("numberPhoto");
-    const textarea = document.getElementById("numbers_input");
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
 
-    const ocrStatus = document.getElementById("ocrStatus");
-    const ocrStatusText = document.getElementById("ocrStatusText");
+    const photoInput =
+        document.getElementById("numberPhoto");
 
-    const charCount = document.getElementById("charCount");
-    const lineCount = document.getElementById("lineCount");
+    const scanPhotoBtn =
+        document.getElementById("scanPhotoBtn");
 
-    const previewSection = document.getElementById("previewSection");
-    const previewTotal = document.getElementById("previewTotal");
-    const preview4D = document.getElementById("preview4D");
-    const preview3D = document.getElementById("preview3D");
-    const previewInvalid = document.getElementById("previewInvalid");
+    const textarea =
+        document.getElementById("numbers_input");
+
+    const ocrStatus =
+        document.getElementById("ocrStatus");
+
+    const ocrStatusText =
+        document.getElementById("ocrStatusText");
+
+    const ocrSpinner =
+        document.getElementById("ocrSpinner");
+
+    const ocrProgressWrap =
+        document.getElementById("ocrProgressWrap");
+
+    const ocrProgress =
+        document.getElementById("ocrProgress");
+
+    const charCount =
+        document.getElementById("charCount");
+
+    const lineCount =
+        document.getElementById("lineCount");
+
+    const previewSection =
+        document.getElementById("previewSection");
+
+    const previewTotal =
+        document.getElementById("previewTotal");
+
+    const preview4D =
+        document.getElementById("preview4D");
+
+    const preview3D =
+        document.getElementById("preview3D");
+
+    const previewInvalid =
+        document.getElementById("previewInvalid");
+
+
+
+    // =========================================================
+    // CHECK ELEMENTS
+    // =========================================================
+
+    if (
+        !photoInput ||
+        !scanPhotoBtn ||
+        !textarea
+    ) {
+
+        console.error(
+            "Photo OCR elements not found."
+        );
+
+        return;
+    }
+
 
 
     // =========================================================
@@ -22,18 +76,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function classifyNumber(number) {
 
-        number = String(number).trim();
+        number =
+            String(number).trim();
+
 
         if (/^\d{3}$/.test(number)) {
+
             return "3D";
         }
 
+
         if (/^\d{4}$/.test(number)) {
+
             return "4D";
         }
 
+
         return "Invalid";
     }
+
 
 
     // =========================================================
@@ -43,15 +104,30 @@ document.addEventListener("DOMContentLoaded", function () {
     function parseNumbers(text) {
 
         if (!text) {
+
             return [];
         }
 
+
         return text
+
             .replace(/,/g, " ")
+
             .split(/\s+/)
-            .map(token => token.trim())
-            .filter(token => /^\d+$/.test(token));
+
+            .map(function (token) {
+
+                return token.trim();
+
+            })
+
+            .filter(function (token) {
+
+                return /^\d+$/.test(token);
+
+            });
     }
+
 
 
     // =========================================================
@@ -60,17 +136,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateCounts() {
 
-        const value = textarea.value;
+        const value =
+            textarea.value;
 
-        charCount.textContent = value.length;
+
+        charCount.textContent =
+            value.length;
+
 
         lineCount.textContent =
             value.length === 0
                 ? 0
-                : value.split("\n").filter(x => x.trim()).length;
+                : value
+                    .split("\n")
+                    .filter(function (x) {
+                        return x.trim();
+                    })
+                    .length;
+
 
         calculatePreview();
     }
+
 
 
     // =========================================================
@@ -79,14 +166,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function calculatePreview() {
 
-        const numbers = parseNumbers(textarea.value);
+        const numbers =
+            parseNumbers(
+                textarea.value
+            );
+
 
         if (numbers.length === 0) {
 
-            previewSection.style.display = "none";
+            previewSection.style.display =
+                "none";
 
             return;
         }
+
 
         let total = 0;
         let count3D = 0;
@@ -96,19 +189,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
         numbers.forEach(function (number) {
 
-            const type = classifyNumber(number);
+            const type =
+                classifyNumber(number);
+
 
             total++;
+
 
             if (type === "3D") {
 
                 count3D++;
 
-            } else if (type === "4D") {
+            }
+
+            else if (type === "4D") {
 
                 count4D++;
 
-            } else {
+            }
+
+            else {
 
                 countInvalid++;
             }
@@ -116,260 +216,489 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
-        previewTotal.textContent = total;
-        preview3D.textContent = count3D;
-        preview4D.textContent = count4D;
-        previewInvalid.textContent = countInvalid;
+        previewTotal.textContent =
+            total;
 
-        previewSection.style.display = "block";
+        preview3D.textContent =
+            count3D;
+
+        preview4D.textContent =
+            count4D;
+
+        previewInvalid.textContent =
+            countInvalid;
+
+
+        previewSection.style.display =
+            "block";
     }
+
 
 
     // =========================================================
     // IMAGE PREPROCESSING
     // =========================================================
 
-    function preprocessImage(file, mode = "normal") {
+    function preprocessImage(
+        file,
+        mode
+    ) {
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(
+            function (resolve, reject) {
 
-            const img = new Image();
-            const url = URL.createObjectURL(file);
-
-
-            img.onload = function () {
-
-                try {
-
-                    /*
-                     * Upscale image.
-                     * Handwritten numbers become easier for OCR.
-                     */
-
-                    const scale = 2;
-
-                    const canvas = document.createElement("canvas");
-
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-
-                    const ctx = canvas.getContext("2d", {
-                        willReadFrequently: true
-                    });
+                const img =
+                    new Image();
 
 
-                    /*
-                     * White background
-                     */
-
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
+                const url =
+                    URL.createObjectURL(file);
 
 
-                    /*
-                     * Draw enlarged image
-                     */
+                img.onload =
+                    function () {
 
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
-
-
-                    const imageData = ctx.getImageData(
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
-
-                    const data = imageData.data;
-
-
-                    for (let i = 0; i < data.length; i += 4) {
-
-                        const r = data[i];
-                        const g = data[i + 1];
-                        const b = data[i + 2];
-
-
-                        /*
-                         * Convert to grayscale
-                         */
-
-                        let gray =
-                            0.299 * r +
-                            0.587 * g +
-                            0.114 * b;
-
-
-                        /*
-                         * Different preprocessing modes
-                         */
-
-                        if (mode === "threshold") {
+                        try {
 
                             /*
-                             * Strong black/white threshold
+                             * Enlarge handwritten image.
                              */
 
-                            gray = gray < 170 ? 0 : 255;
+                            const scale = 2;
 
-                        } else if (mode === "dark") {
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+
+                            canvas.width =
+                                img.width * scale;
+
+
+                            canvas.height =
+                                img.height * scale;
+
+
+                            const ctx =
+                                canvas.getContext(
+                                    "2d",
+                                    {
+                                        willReadFrequently: true
+                                    }
+                                );
+
 
                             /*
-                             * Increase dark handwriting
+                             * White background.
                              */
 
-                            gray = gray < 200
-                                ? gray * 0.65
-                                : Math.min(255, gray + 20);
+                            ctx.fillStyle =
+                                "#ffffff";
 
-                        } else if (mode === "contrast") {
 
-                            /*
-                             * Strong contrast
-                             */
-
-                            gray =
-                                ((gray - 128) * 1.8) + 128;
-
-                            gray = Math.max(
+                            ctx.fillRect(
                                 0,
-                                Math.min(255, gray)
+                                0,
+                                canvas.width,
+                                canvas.height
                             );
+
+
+                            /*
+                             * Draw image.
+                             */
+
+                            ctx.drawImage(
+                                img,
+                                0,
+                                0,
+                                canvas.width,
+                                canvas.height
+                            );
+
+
+                            const imageData =
+                                ctx.getImageData(
+                                    0,
+                                    0,
+                                    canvas.width,
+                                    canvas.height
+                                );
+
+
+                            const data =
+                                imageData.data;
+
+
+                            /*
+                             * Process pixels.
+                             */
+
+                            for (
+                                let i = 0;
+                                i < data.length;
+                                i += 4
+                            ) {
+
+                                const r =
+                                    data[i];
+
+                                const g =
+                                    data[i + 1];
+
+                                const b =
+                                    data[i + 2];
+
+
+                                /*
+                                 * Grayscale.
+                                 */
+
+                                let gray =
+                                    (
+                                        0.299 * r +
+                                        0.587 * g +
+                                        0.114 * b
+                                    );
+
+
+                                /*
+                                 * Normal.
+                                 */
+
+                                if (
+                                    mode === "normal"
+                                ) {
+
+                                    gray =
+                                        gray;
+
+                                }
+
+
+                                /*
+                                 * Strong contrast.
+                                 */
+
+                                else if (
+                                    mode === "contrast"
+                                ) {
+
+                                    gray =
+                                        (
+                                            (gray - 128)
+                                            * 1.8
+                                        ) + 128;
+
+
+                                    gray =
+                                        Math.max(
+                                            0,
+                                            Math.min(
+                                                255,
+                                                gray
+                                            )
+                                        );
+                                }
+
+
+                                /*
+                                 * Threshold.
+                                 */
+
+                                else if (
+                                    mode === "threshold"
+                                ) {
+
+                                    gray =
+                                        gray < 175
+                                            ? 0
+                                            : 255;
+                                }
+
+
+                                /*
+                                 * Dark handwriting.
+                                 */
+
+                                else if (
+                                    mode === "dark"
+                                ) {
+
+                                    if (
+                                        gray < 190
+                                    ) {
+
+                                        gray =
+                                            gray * 0.55;
+
+                                    } else {
+
+                                        gray =
+                                            Math.min(
+                                                255,
+                                                gray + 25
+                                            );
+                                    }
+                                }
+
+
+                                data[i] =
+                                    gray;
+
+                                data[i + 1] =
+                                    gray;
+
+                                data[i + 2] =
+                                    gray;
+                            }
+
+
+                            ctx.putImageData(
+                                imageData,
+                                0,
+                                0
+                            );
+
+
+                            URL.revokeObjectURL(
+                                url
+                            );
+
+
+                            resolve(
+                                canvas.toDataURL(
+                                    "image/png"
+                                )
+                            );
+
 
                         }
 
+                        catch (error) {
 
-                        data[i] = gray;
-                        data[i + 1] = gray;
-                        data[i + 2] = gray;
-                    }
+                            URL.revokeObjectURL(
+                                url
+                            );
 
-
-                    ctx.putImageData(imageData, 0, 0);
-
-                    URL.revokeObjectURL(url);
-
-                    resolve(
-                        canvas.toDataURL("image/png")
-                    );
+                            reject(error);
+                        }
+                    };
 
 
-                } catch (error) {
+                img.onerror =
+                    function () {
 
-                    URL.revokeObjectURL(url);
+                        URL.revokeObjectURL(
+                            url
+                        );
 
-                    reject(error);
-                }
-            };
-
-
-            img.onerror = function () {
-
-                URL.revokeObjectURL(url);
-
-                reject(
-                    new Error("Unable to read image.")
-                );
-            };
+                        reject(
+                            new Error(
+                                "Unable to read image."
+                            )
+                        );
+                    };
 
 
-            img.src = url;
-        });
+                img.src = url;
+
+            }
+        );
     }
 
 
+
     // =========================================================
-    // CLEAN OCR TEXT
+    // OCR
     // =========================================================
 
-    function cleanOCRText(text) {
+    async function runOCR(
+        image,
+        psm
+    ) {
+
+        try {
+
+            const result =
+                await Tesseract.recognize(
+                    image,
+                    "eng",
+                    {
+
+                        logger:
+                            function (info) {
+
+                                if (
+                                    info.status ===
+                                    "recognizing text"
+                                ) {
+
+                                    const progress =
+                                        Math.round(
+                                            info.progress *
+                                            100
+                                        );
+
+
+                                    ocrProgress.style.width =
+                                        progress + "%";
+
+
+                                    ocrStatusText.textContent =
+                                        "Reading handwritten numbers... "
+                                        +
+                                        progress
+                                        +
+                                        "%";
+                                }
+                            },
+
+
+                        /*
+                         * DIGITS ONLY.
+                         */
+
+                        tessedit_char_whitelist:
+                            "0123456789",
+
+
+                        /*
+                         * Sparse text.
+                         *
+                         * Important for your photo
+                         * because numbers are in
+                         * different positions.
+                         */
+
+                        tessedit_pageseg_mode:
+                            psm
+
+                    }
+                );
+
+
+            return result.data.text || "";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "OCR error:",
+                error
+            );
+
+
+            return "";
+        }
+    }
+
+
+
+    // =========================================================
+    // EXTRACT 3D / 4D NUMBERS
+    // =========================================================
+
+    function extractNumbers(text) {
 
         if (!text) {
+
             return [];
         }
 
 
+        const result = [];
+
+
         /*
-         * OCR sometimes returns spaces/new lines
-         * between digits.
-         *
-         * Example:
-         *
-         * 2 3 5
-         *
-         * becomes
-         *
-         * 235
+         * Split OCR into lines.
          */
 
+        const lines =
+            text
+                .split(/\r?\n/)
+                .map(function (line) {
 
-        const lines = text
-            .split(/\r?\n/)
-            .map(line => line.trim())
-            .filter(Boolean);
+                    return line.trim();
 
-
-        const numbers = [];
-
-
-        lines.forEach(function (line) {
-
-            /*
-             * Remove everything except digits and spaces.
-             *
-             * Letters are NOT accepted.
-             */
-
-            const cleanedLine =
-                line.replace(/[^0-9\s]/g, " ");
+                })
+                .filter(Boolean);
 
 
-            /*
-             * Split into groups
-             */
-
-            const groups =
-                cleanedLine
-                    .split(/\s+/)
-                    .filter(Boolean);
-
-
-            groups.forEach(function (group) {
+        lines.forEach(
+            function (line) {
 
                 /*
-                 * ONLY 3D and 4D numbers.
+                 * Remove letters and symbols.
                  */
 
-                if (/^\d{3}$/.test(group)) {
+                const cleaned =
+                    line.replace(
+                        /[^0-9\s]/g,
+                        " "
+                    );
 
-                    numbers.push(group);
 
-                } else if (/^\d{4}$/.test(group)) {
+                /*
+                 * Separate number groups.
+                 */
 
-                    numbers.push(group);
-                }
-            });
-        });
+                const groups =
+                    cleaned
+                        .split(/\s+/)
+                        .filter(Boolean);
+
+
+                groups.forEach(
+                    function (group) {
+
+                        /*
+                         * ONLY 3D.
+                         */
+
+                        if (
+                            /^\d{3}$/.test(
+                                group
+                            )
+                        ) {
+
+                            result.push(group);
+                        }
+
+
+                        /*
+                         * ONLY 4D.
+                         */
+
+                        else if (
+                            /^\d{4}$/.test(
+                                group
+                            )
+                        ) {
+
+                            result.push(group);
+                        }
+
+                    }
+                );
+
+            }
+        );
 
 
         /*
-         * Also look for standalone 3/4 digit
-         * values in complete OCR text.
+         * Search entire OCR output
+         * for standalone 3/4 digit values.
          */
 
         const normalized =
-            text.replace(/[^0-9\s]/g, " ");
+            text.replace(
+                /[^0-9\s]/g,
+                " "
+            );
 
 
         const tokens =
@@ -378,164 +707,171 @@ document.addEventListener("DOMContentLoaded", function () {
                 .filter(Boolean);
 
 
-        tokens.forEach(function (token) {
+        tokens.forEach(
+            function (token) {
 
-            if (
-                /^\d{3}$/.test(token) ||
-                /^\d{4}$/.test(token)
-            ) {
+                if (
+                    /^\d{3}$/.test(token) ||
+                    /^\d{4}$/.test(token)
+                ) {
 
-                numbers.push(token);
+                    result.push(token);
+                }
+
             }
-        });
+        );
 
-
-        return numbers;
-    }
-
-
-    // =========================================================
-    // REMOVE DUPLICATES CREATED BY OCR PASSES
-    // =========================================================
-
-    function removeOCRDuplicates(numbers) {
-
-        /*
-         * Same OCR result may appear multiple times
-         * because we scan the image using different
-         * preprocessing methods.
-         *
-         * We remove only duplicate results produced
-         * by the OCR process.
-         */
-
-        const result = [];
-
-        numbers.forEach(function (number) {
-
-            if (!result.includes(number)) {
-                result.push(number);
-            }
-        });
 
         return result;
     }
 
 
+
     // =========================================================
-    // RUN OCR
+    // REMOVE DUPLICATES
     // =========================================================
 
-    async function runOCR(image, psm) {
+    function removeDuplicates(
+        numbers
+    ) {
 
-        try {
-
-            const result = await Tesseract.recognize(
-                image,
-                "eng",
-                {
-
-                    logger: function (info) {
-
-                        if (
-                            info.status ===
-                            "recognizing text"
-                        ) {
-
-                            const progress =
-                                Math.round(
-                                    info.progress * 100
-                                );
-
-                            ocrStatusText.textContent =
-                                "Reading numbers... " +
-                                progress +
-                                "%";
-                        }
-                    },
+        const unique = [];
 
 
-                    /*
-                     * Digits ONLY
-                     */
+        numbers.forEach(
+            function (number) {
 
-                    tessedit_char_whitelist:
-                        "0123456789",
+                if (
+                    !unique.includes(number)
+                ) {
 
-
-                    /*
-                     * Page segmentation mode.
-                     *
-                     * 11 = Sparse text
-                     * Best for numbers scattered
-                     * around the image.
-                     */
-
-                    tessedit_pageseg_mode: psm
-
+                    unique.push(number);
                 }
-            );
+
+            }
+        );
 
 
-            return result.data.text || "";
-
-        } catch (error) {
-
-            console.error(
-                "OCR error:",
-                error
-            );
-
-            return "";
-        }
+        return unique;
     }
 
 
+
     // =========================================================
-    // PHOTO OCR
+    // SCAN PHOTO BUTTON
     // =========================================================
 
-    photoInput.addEventListener(
-        "change",
+    scanPhotoBtn.addEventListener(
+        "click",
         async function () {
+
+            /*
+             * Photo must be selected first.
+             */
 
             const file =
                 photoInput.files[0];
 
 
             if (!file) {
+
+                ocrStatus.style.display =
+                    "block";
+
+
+                ocrStatusText.textContent =
+                    "Please choose a photo first.";
+
+
+                ocrStatusText.className =
+                    "small text-danger";
+
+
                 return;
             }
 
 
-            if (!file.type.startsWith("image/")) {
+            /*
+             * Check image.
+             */
 
-                alert(
-                    "Please select an image file."
-                );
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
 
-                photoInput.value = "";
+                ocrStatus.style.display =
+                    "block";
+
+
+                ocrStatusText.textContent =
+                    "Please select an image file.";
+
+
+                ocrStatusText.className =
+                    "small text-danger";
+
+
+                photoInput.value =
+                    "";
+
 
                 return;
             }
+
+
+
+            // =================================================
+            // START
+            // =================================================
+
+            scanPhotoBtn.disabled =
+                true;
+
+
+            scanPhotoBtn.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2"></span>SCANNING...';
 
 
             ocrStatus.style.display =
                 "block";
 
 
+            ocrStatusText.className =
+                "small text-muted";
+
+
+            ocrProgressWrap.style.display =
+                "block";
+
+
+            ocrProgress.style.width =
+                "0%";
+
+
+            ocrSpinner.style.display =
+                "inline-block";
+
+
             ocrStatusText.textContent =
-                "Preparing photo...";
+                "Preparing handwritten photo...";
+
 
 
             try {
 
-                /*
-                 * -----------------------------------------
-                 * PASS 1
-                 * Original + enlarged
-                 * -----------------------------------------
-                 */
+                let allNumbers = [];
+
+
+
+                // =================================================
+                // PASS 1 - NORMAL
+                // =================================================
+
+                ocrStatusText.textContent =
+                    "Scanning photo - Pass 1...";
+
 
                 const normalImage =
                     await preprocessImage(
@@ -543,22 +879,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         "normal"
                     );
 
-
-                ocrStatusText.textContent =
-                    "Scanning handwritten numbers...";
-
-
-                let allNumbers = [];
-
-
-                /*
-                 * PSM 11
-                 * Sparse text
-                 *
-                 * Best for your photo because
-                 * numbers are located in different
-                 * places.
-                 */
 
                 const text1 =
                     await runOCR(
@@ -568,16 +888,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 allNumbers.push(
-                    ...cleanOCRText(text1)
+                    ...extractNumbers(
+                        text1
+                    )
                 );
 
 
-                /*
-                 * -----------------------------------------
-                 * PASS 2
-                 * Strong contrast
-                 * -----------------------------------------
-                 */
+
+                // =================================================
+                // PASS 2 - CONTRAST
+                // =================================================
+
+                ocrStatusText.textContent =
+                    "Improving handwriting - Pass 2...";
+
 
                 const contrastImage =
                     await preprocessImage(
@@ -594,16 +918,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 allNumbers.push(
-                    ...cleanOCRText(text2)
+                    ...extractNumbers(
+                        text2
+                    )
                 );
 
 
-                /*
-                 * -----------------------------------------
-                 * PASS 3
-                 * Threshold
-                 * -----------------------------------------
-                 */
+
+                // =================================================
+                // PASS 3 - THRESHOLD
+                // =================================================
+
+                ocrStatusText.textContent =
+                    "Checking numbers - Pass 3...";
+
 
                 const thresholdImage =
                     await preprocessImage(
@@ -620,16 +948,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 allNumbers.push(
-                    ...cleanOCRText(text3)
+                    ...extractNumbers(
+                        text3
+                    )
                 );
 
 
-                /*
-                 * -----------------------------------------
-                 * PASS 4
-                 * Dark handwriting
-                 * -----------------------------------------
-                 */
+
+                // =================================================
+                // PASS 4 - DARK
+                // =================================================
+
+                ocrStatusText.textContent =
+                    "Final number scan - Pass 4...";
+
 
                 const darkImage =
                     await preprocessImage(
@@ -646,22 +978,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 allNumbers.push(
-                    ...cleanOCRText(text4)
+                    ...extractNumbers(
+                        text4
+                    )
                 );
 
 
-                /*
-                 * Remove duplicate OCR results.
-                 */
+
+                // =================================================
+                // FINAL RESULT
+                // =================================================
 
                 const detectedNumbers =
-                    removeOCRDuplicates(
+                    removeDuplicates(
                         allNumbers
                     );
 
 
                 /*
-                 * ONLY 3D / 4D
+                 * ONLY 3D and 4D.
                  */
 
                 const finalNumbers =
@@ -669,44 +1004,60 @@ document.addEventListener("DOMContentLoaded", function () {
                         function (number) {
 
                             return (
-                                /^\d{3}$/.test(number) ||
-                                /^\d{4}$/.test(number)
+                                /^\d{3}$/.test(
+                                    number
+                                ) ||
+
+                                /^\d{4}$/.test(
+                                    number
+                                )
                             );
                         }
                     );
 
 
+
                 // =================================================
-                // RESULT
+                // NO RESULT
                 // =================================================
 
                 if (
                     finalNumbers.length === 0
                 ) {
 
-                    textarea.value = "";
+                    textarea.value =
+                        "";
+
+
+                    ocrProgress.style.width =
+                        "100%";
+
 
                     ocrStatusText.textContent =
-                        "No 3D or 4D numbers detected.";
+                        "No 3D or 4D numbers detected. Try a clearer photo.";
+
+
+                    ocrStatusText.className =
+                        "small text-danger";
+
 
                     updateCounts();
+
 
                     return;
                 }
 
 
-                /*
-                 * Put detected numbers
-                 * one per line.
-                 */
+
+                // =================================================
+                // PUT NUMBERS INTO TEXTAREA
+                // =================================================
 
                 textarea.value =
-                    finalNumbers.join("\n");
+                    finalNumbers.join(
+                        "\n"
+                    );
 
-
-                /*
-                 * Trigger textarea update.
-                 */
 
                 textarea.dispatchEvent(
                     new Event(
@@ -721,20 +1072,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 updateCounts();
 
 
-                /*
-                 * Count 3D / 4D
-                 */
+
+                // =================================================
+                // COUNTS
+                // =================================================
 
                 const count3D =
                     finalNumbers.filter(
-                        n => /^\d{3}$/.test(n)
+                        function (number) {
+
+                            return /^\d{3}$/.test(
+                                number
+                            );
+                        }
                     ).length;
 
 
                 const count4D =
                     finalNumbers.filter(
-                        n => /^\d{4}$/.test(n)
+                        function (number) {
+
+                            return /^\d{4}$/.test(
+                                number
+                            );
+                        }
                     ).length;
+
+
+
+                // =================================================
+                // SUCCESS
+                // =================================================
+
+                ocrProgress.style.width =
+                    "100%";
 
 
                 ocrStatusText.textContent =
@@ -747,7 +1118,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     " 4D.";
 
 
-            } catch (error) {
+                ocrStatusText.className =
+                    "small text-success";
+
+
+            }
+
+            catch (error) {
 
                 console.error(
                     "Photo OCR failed:",
@@ -756,21 +1133,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 ocrStatusText.textContent =
-                    "Could not read the photo. Please try again.";
+                    "OCR failed. Please try another clear photo.";
+
+
+                ocrStatusText.className =
+                    "small text-danger";
+            }
+
+
+            finally {
+
+                /*
+                 * Enable scan button again.
+                 */
+
+                scanPhotoBtn.disabled =
+                    false;
+
+
+                scanPhotoBtn.innerHTML =
+                    '<i class="fas fa-magic me-2"></i>SCAN PHOTO';
+
+
+                ocrSpinner.style.display =
+                    "none";
             }
 
         }
     );
 
 
+
     // =========================================================
-    // MANUAL INPUT
+    // MANUAL TEXT INPUT
     // =========================================================
 
     textarea.addEventListener(
         "input",
         updateCounts
     );
+
 
 
     // =========================================================
@@ -780,17 +1182,39 @@ document.addEventListener("DOMContentLoaded", function () {
     window.clearTextarea =
         function () {
 
-            textarea.value = "";
+            textarea.value =
+                "";
 
-            photoInput.value = "";
+            photoInput.value =
+                "";
+
 
             ocrStatus.style.display =
                 "none";
 
+
+            ocrProgressWrap.style.display =
+                "none";
+
+
+            ocrProgress.style.width =
+                "0%";
+
+
+            scanPhotoBtn.disabled =
+                false;
+
+
+            scanPhotoBtn.innerHTML =
+                '<i class="fas fa-magic me-2"></i>SCAN PHOTO';
+
+
             updateCounts();
+
 
             textarea.focus();
         };
+
 
 
     // =========================================================
