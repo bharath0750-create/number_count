@@ -3,498 +3,195 @@
 {% block title %}Add Numbers - 3D & 4D Number Counter{% endblock %}
 
 {% block content %}
-
 <div class="row justify-content-center">
-
     <div class="col-12 col-lg-10">
-
         <div class="card shadow-sm border-0">
-
-            <!-- HEADER -->
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-
-                <h4 class="mb-0 fw-semibold">
-                    <i class="fas fa-plus-circle me-2 text-primary"></i>
-                    Add Numbers
-                </h4>
-
-                <a href="{{ url_for('dashboard') }}"
-                   class="btn btn-sm btn-outline-secondary">
-
-                    <i class="fas fa-arrow-left me-1"></i>
-                    Back to Dashboard
-
+                <h4 class="mb-0 fw-semibold"><i class="fas fa-plus-circle me-2 text-primary"></i>Add Numbers</h4>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
                 </a>
-
             </div>
-
-
             <div class="card-body p-4">
-
-
-                <!-- INFORMATION -->
-                <div class="alert alert-info border-0 mb-4">
-
-                    <h6 class="alert-heading">
-
-                        <i class="fas fa-info-circle me-2"></i>
-                        Input Format Guide
-
-                    </h6>
-
-                    <p class="mb-2">
-                        Enter 3-digit or 4-digit numbers.
-                    </p>
-
+                <div class="alert alert-info border-0 mb-4" role="alert">
+                    <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Input Format Guide</h6>
+                    <p class="mb-2">Enter numbers in any of these formats:</p>
                     <ul class="mb-0 small">
-
-                        <li>
-                            <strong>One per line:</strong>
-                            <code>235</code> / <code>432</code> /
-                            <code>328</code>
-                        </li>
-
-                        <li>
-                            <strong>4D:</strong>
-                            <code>1234</code> /
-                            <code>5678</code>
-                        </li>
-
-                        <li>
-                            <strong>Comma separated:</strong>
-                            <code>235, 432, 328</code>
-                        </li>
-
-                        <li>
-                            <strong>Space separated:</strong>
-                            <code>235 432 328</code>
-                        </li>
-
+                        <li><strong>One per line:</strong> <code>1234</code> / <code>5678</code> / <code>123</code></li>
+                        <li><strong>Comma-separated:</strong> <code>1234, 5678, 123</code></li>
+                        <li><strong>Space-separated:</strong> <code>1234 5678 123</code></li>
+                        <li><strong>Mixed:</strong> <code>1234, 5678 123\n456</code></li>
                     </ul>
-
                     <hr class="my-2">
-
                     <small class="text-muted">
-
-                        <strong>Classification:</strong>
-                        Exactly 3 digits = 3D |
-                        Exactly 4 digits = 4D
-
-                        <br>
-
-                        <strong>Photo OCR:</strong>
-                        Handwritten 3D and 4D numbers can be scanned.
-
+                        <strong>Classification Rules:</strong> Exactly 3 digits = 3D | Exactly 4 digits = 4D | Anything else = Invalid<br>
+                        <strong>Duplicates:</strong> All entries are counted individually. Repeated numbers create separate records.
                     </small>
-
                 </div>
 
-
-
-                <!-- ================================================= -->
-                <!-- PHOTO OCR -->
-                <!-- ================================================= -->
-
+                <!-- Photo OCR Scanner -->
                 <div class="card border mb-4">
-
                     <div class="card-body">
-
-                        <h5 class="fw-semibold mb-2">
-
-                            <i class="fas fa-camera me-2 text-primary"></i>
-
-                            Scan Numbers from Photo
-
-                        </h5>
-
-
-                        <p class="text-muted small mb-3">
-
-                            Select a photo containing handwritten
-                            3-digit and 4-digit numbers.
-
-                            <br>
-
-                            <strong>
-                                Select photo first, then click SCAN PHOTO.
-                            </strong>
-
-                        </p>
-
-
-
-                        <!-- FILE INPUT + SCAN BUTTON -->
-
+                        <h5 class="fw-semibold mb-2"><i class="fas fa-camera me-2 text-primary"></i>Scan Numbers from Photo</h5>
+                        <p class="text-muted small mb-3">Upload a clear photo containing 3-digit and 4-digit numbers. The numbers will be detected and added to the input box.</p>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
-
-                            <input
-                                type="file"
-                                id="numberPhoto"
-                                accept="image/*"
-                                class="form-control"
-                                style="max-width:420px;"
-                            >
-
-
-                            <button
-                                type="button"
-                                class="btn btn-outline-primary"
-                                id="scanPhotoBtn"
-                            >
-
-                                <i class="fas fa-magic me-2"></i>
-
-                                SCAN PHOTO
-
+                            <input type="file" id="numberPhoto" accept="image/*" class="form-control" style="max-width:420px;">
+                            <button type="button" class="btn btn-outline-primary" id="scanPhotoBtn">
+                                <i class="fas fa-magic me-2"></i>SCAN PHOTO
                             </button>
-
                         </div>
-
-
-
-                        <!-- STATUS -->
-
-                        <div
-                            id="ocrStatus"
-                            class="mt-3"
-                            style="display:none;"
-                        >
-
-                            <div class="d-flex align-items-center gap-2">
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-primary"
-                                    id="ocrSpinner"
-                                    role="status"
-                                ></div>
-
-                                <span
-                                    id="ocrStatusText"
-                                    class="small text-muted"
-                                >
-                                    Preparing photo...
-                                </span>
-
-                            </div>
-
+                        <div class="progress mt-3" id="ocrProgressWrap" style="display:none;height:8px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="ocrProgress" role="progressbar" style="width:0%"></div>
                         </div>
-
-
-
-                        <!-- PROGRESS -->
-
-                        <div
-                            class="progress mt-3"
-                            id="ocrProgressWrap"
-                            style="display:none;height:8px;"
-                        >
-
-                            <div
-                                class="progress-bar progress-bar-striped progress-bar-animated"
-                                id="ocrProgress"
-                                role="progressbar"
-                                style="width:0%;"
-                            ></div>
-
+                        <div class="small mt-2" id="ocrStatus"></div>
+                        <div class="alert alert-warning py-2 mt-3 mb-0 small" id="ocrHint" style="display:none;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            For better accuracy, use a clear, well-lit photo with straight numbers and minimal background noise.
                         </div>
-
-
-
-                        <!-- OCR HINT -->
-
-                        <div
-                            class="alert alert-warning py-2 mt-3 mb-0 small"
-                            id="ocrHint"
-                        >
-
-                            <i class="fas fa-lightbulb me-1"></i>
-
-                            Best result:
-                            clear photo, good lighting,
-                            numbers should be visible,
-                            and avoid blur.
-
-                        </div>
-
                     </div>
-
                 </div>
 
-
-
-                <!-- ================================================= -->
-                <!-- ADD NUMBERS FORM -->
-                <!-- ================================================= -->
-
-                <form
-                    method="POST"
-                    id="addNumbersForm"
-                >
-
-
+                <form method="POST" id="addNumbersForm">
                     <div class="mb-3">
-
-                        <label
-                            for="numbers_input"
-                            class="form-label fw-semibold"
-                        >
-
-                            Numbers Input
-
-                        </label>
-
-
-                        <textarea
-                            class="form-control form-control-lg"
-                            id="numbers_input"
-                            name="numbers_input"
-                            rows="12"
-                            placeholder="Photo scan result will appear here...
-
-Example:
-235
-432
-328
-790
-971
-645"
-                            required
-                        ></textarea>
-
-
+                        <label for="numbers_input" class="form-label fw-semibold">Numbers Input</label>
+                        <textarea class="form-control form-control-lg" id="numbers_input" name="numbers_input" 
+                                  rows="12" placeholder="Paste your numbers here...&#10;Example:&#10;1234&#10;5678&#10;1234&#10;1111&#10;123&#10;456"
+                                  required></textarea>
                         <div class="form-text">
-
-                            <span id="charCount">0</span>
-                            characters |
-
-                            <span id="lineCount">0</span>
-                            lines
-
+                            <span id="charCount">0</span> characters | 
+                            <span id="lineCount">0</span> lines
                         </div>
-
                     </div>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- BUTTONS -->
-                    <!-- ================================================= -->
 
                     <div class="d-flex flex-wrap gap-2">
-
-
-                        <!-- FINAL SUBMIT -->
-
-                        <button
-                            type="submit"
-                            class="btn btn-primary btn-lg px-5"
-                            id="submitBtn"
-                        >
-
-                            <i class="fas fa-plus-circle me-2"></i>
-
-                            ADD NUMBERS
-
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
+                            <i class="fas fa-plus-circle me-2"></i>ADD NUMBERS
                         </button>
-
-
-
-                        <!-- CLEAR -->
-
-                        <button
-                            type="button"
-                            class="btn btn-outline-secondary btn-lg"
-                            onclick="clearTextarea()"
-                        >
-
-                            <i class="fas fa-eraser me-2"></i>
-
-                            Clear
-
+                        <button type="button" class="btn btn-outline-secondary btn-lg" onclick="clearTextarea()">
+                            <i class="fas fa-eraser me-2"></i>Clear
                         </button>
-
-
-
-                        <!-- CANCEL -->
-
-                        <a
-                            href="{{ url_for('dashboard') }}"
-                            class="btn btn-outline-secondary btn-lg ms-auto"
-                        >
-
-                            <i class="fas fa-times me-2"></i>
-
-                            Cancel
-
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg ms-auto">
+                            <i class="fas fa-times me-2"></i>Cancel
                         </a>
-
                     </div>
-
-
                 </form>
 
-
-
-                <!-- ================================================= -->
-                <!-- PREVIEW -->
-                <!-- ================================================= -->
-
-                <div
-                    class="mt-4"
-                    id="previewSection"
-                    style="display:none;"
-                >
-
-                    <h5 class="fw-semibold mb-3">
-
-                        <i class="fas fa-eye me-2"></i>
-
-                        Preview
-
-                    </h5>
-
-
-
+                <!-- Preview Section -->
+                <div class="mt-4" id="previewSection" style="display: none;">
+                    <h5 class="fw-semibold mb-3"><i class="fas fa-eye me-2"></i>Preview</h5>
                     <div class="row g-3">
-
-
-                        <!-- TOTAL -->
-
                         <div class="col-md-4">
-
                             <div class="card bg-light border-0">
-
                                 <div class="card-body text-center py-3">
-
-                                    <h3
-                                        class="text-primary mb-1"
-                                        id="previewTotal"
-                                    >
-                                        0
-                                    </h3>
-
-                                    <small class="text-muted">
-                                        Total Entries
-                                    </small>
-
+                                    <h3 class="text-primary mb-1" id="previewTotal">0</h3>
+                                    <small class="text-muted">Total Entries</small>
                                 </div>
-
                             </div>
-
                         </div>
-
-
-
-                        <!-- 4D -->
-
                         <div class="col-md-4">
-
                             <div class="card bg-light border-0">
-
                                 <div class="card-body text-center py-3">
-
-                                    <h3
-                                        class="text-success mb-1"
-                                        id="preview4D"
-                                    >
-                                        0
-                                    </h3>
-
-                                    <small class="text-muted">
-                                        4D Numbers
-                                    </small>
-
+                                    <h3 class="text-success mb-1" id="preview4D">0</h3>
+                                    <small class="text-muted">4D Numbers</small>
                                 </div>
-
                             </div>
-
                         </div>
-
-
-
-                        <!-- 3D -->
-
                         <div class="col-md-4">
-
                             <div class="card bg-light border-0">
-
                                 <div class="card-body text-center py-3">
-
-                                    <h3
-                                        class="text-info mb-1"
-                                        id="preview3D"
-                                    >
-                                        0
-                                    </h3>
-
-                                    <small class="text-muted">
-                                        3D Numbers
-                                    </small>
-
+                                    <h3 class="text-info mb-1" id="preview3D">0</h3>
+                                    <small class="text-muted">3D Numbers</small>
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
-
-
-
-                    <!-- INVALID -->
-
                     <div class="mt-3">
-
                         <div class="card bg-light border-0">
-
                             <div class="card-body text-center py-3">
-
-                                <h3
-                                    class="text-warning mb-1"
-                                    id="previewInvalid"
-                                >
-                                    0
-                                </h3>
-
-                                <small class="text-muted">
-                                    Invalid Entries
-                                </small>
-
+                                <h3 class="text-warning mb-1" id="previewInvalid">0</h3>
+                                <small class="text-muted">Invalid Entries</small>
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
-
 {% endblock %}
 
-
-
-<!-- ============================================================= -->
-<!-- JAVASCRIPT -->
-<!-- ============================================================= -->
-
 {% block extra_js %}
-
-<!-- Tesseract OCR -->
-
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-
-<!-- Our OCR JavaScript -->
-
 <script src="{{ url_for('static', filename='js/photo-ocr.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('numbers_input');
+    const charCount = document.getElementById('charCount');
+    const lineCount = document.getElementById('lineCount');
+    const previewSection = document.getElementById('previewSection');
+    const previewTotal = document.getElementById('previewTotal');
+    const preview4D = document.getElementById('preview4D');
+    const preview3D = document.getElementById('preview3D');
+    const previewInvalid = document.getElementById('previewInvalid');
+    let debounceTimer;
 
+    function updateCounts() {
+        const value = textarea.value;
+        charCount.textContent = value.length;
+        lineCount.textContent = value.split('\n').length;
+        
+        // Debounce preview calculation
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(calculatePreview, 300);
+    }
+
+    function classifyNumber(num) {
+        num = num.trim();
+        if (!num) return null;
+        if (/^\d{3}$/.test(num)) return '3D';
+        if (/^\d{4}$/.test(num)) return '4D';
+        return 'Invalid';
+    }
+
+    function parseInput(text) {
+        if (!text) return [];
+        const normalized = text.replace(/,/g, ' ');
+        return normalized.split(/\s+/).filter(s => s.trim());
+    }
+
+    function calculatePreview() {
+        const numbers = parseInput(textarea.value);
+        if (numbers.length === 0) {
+            previewSection.style.display = 'none';
+            return;
+        }
+
+        let total = 0, count4D = 0, count3D = 0, countInvalid = 0;
+        numbers.forEach(num => {
+            const type = classifyNumber(num);
+            if (type) {
+                total++;
+                if (type === '4D') count4D++;
+                else if (type === '3D') count3D++;
+                else countInvalid++;
+            }
+        });
+
+        previewTotal.textContent = total;
+        preview4D.textContent = count4D;
+        preview3D.textContent = count3D;
+        previewInvalid.textContent = countInvalid;
+        previewSection.style.display = 'block';
+    }
+
+    function clearTextarea() {
+        textarea.value = '';
+        updateCounts();
+        textarea.focus();
+    }
+
+    textarea.addEventListener('input', updateCounts);
+    updateCounts(); // Initial count
+});
+</script>
 {% endblock %}
